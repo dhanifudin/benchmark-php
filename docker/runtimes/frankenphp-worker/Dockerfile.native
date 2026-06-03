@@ -1,0 +1,21 @@
+ARG PHP_VERSION=8.4
+FROM dunglas/frankenphp:1-php${PHP_VERSION}-bookworm
+
+WORKDIR /app
+
+RUN install-php-extensions \
+    pdo_mysql \
+    redis \
+    opcache
+
+COPY apps/native /app
+COPY docker/runtimes/frankenphp-classic/Caddyfile /etc/caddy/Caddyfile
+COPY docker/runtimes/frankenphp-classic/configure-runtime-frankenphp.sh /usr/local/bin/configure-runtime-frankenphp.sh
+
+RUN chmod +x /usr/local/bin/configure-runtime-frankenphp.sh \
+    && chown -R www-data:www-data /app
+
+ENV FRANKENPHP_CONFIG="worker /app/public/worker.php"
+
+ENTRYPOINT ["/usr/local/bin/configure-runtime-frankenphp.sh"]
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

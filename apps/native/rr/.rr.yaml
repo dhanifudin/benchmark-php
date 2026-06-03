@@ -1,0 +1,21 @@
+version: '3'
+
+server:
+  command: "php /app/rr/worker.php"
+
+rpc:
+  listen: tcp://127.0.0.1:6001
+
+http:
+  address: 0.0.0.0:80
+  max_request_size: 16
+  middleware: []
+  pool:
+    num_workers: 4
+    max_jobs: 0
+    allocate_timeout: 60s
+    destroy_timeout: 60s
+
+logs:
+  mode: production
+  level: warn

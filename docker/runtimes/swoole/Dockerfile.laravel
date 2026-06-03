@@ -1,0 +1,24 @@
+ARG PHP_VERSION=8.4
+FROM php:${PHP_VERSION}-cli
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libzip-dev \
+    && docker-php-ext-install pdo_mysql opcache pcntl \
+    && pecl install openswoole-25.2.0 \
+    && docker-php-ext-enable openswoole \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY apps/laravel /app
+COPY docker/runtimes/swoole/configure-runtime-swoole.sh /usr/local/bin/configure-runtime-swoole.sh
+
+RUN chmod +x /usr/local/bin/configure-runtime-swoole.sh \
+    && mkdir -p /app/storage/framework/cache/data \
+    && mkdir -p /app/storage/framework/sessions \
+    && mkdir -p /app/storage/framework/views \
+    && mkdir -p /app/storage/logs \
+    && chown -R www-data:www-data /app
+
+ENTRYPOINT ["/usr/local/bin/configure-runtime-swoole.sh"]
+CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=80"]

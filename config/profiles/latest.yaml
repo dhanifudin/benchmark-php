@@ -1,0 +1,84 @@
+name: latest
+php_profile: latest
+php_versions:
+  - "8.4"
+description: >-
+  Main benchmark profile for the latest mainstream PHP target using the newest
+  supported framework versions on PHP 8.4.
+framework_versions:
+  native: 8.4 runtime baseline
+  laravel: latest-supported
+  codeigniter: latest-supported
+frameworks:
+  - native
+  - laravel
+  - codeigniter
+runtimes:
+  - name: mod_php
+    family: classic
+    configs:
+      - baseline
+      - opcache
+      - opcache-jit-tracing
+  - name: php-fpm
+    family: classic
+    configs:
+      - baseline
+      - opcache
+      - opcache-jit-tracing
+  - name: frankenphp-classic
+    family: classic
+    configs:
+      - baseline
+      - opcache
+      - opcache-jit-tracing
+  - name: frankenphp-worker
+    family: persistent
+    configs:
+      - baseline
+      - opcache
+  - name: roadrunner
+    family: persistent
+    configs:
+      - baseline
+      - opcache
+  - name: swoole
+    family: persistent
+    configs:
+      - baseline
+      - opcache
+code_forms:
+  - plain
+  - obfuscated-supported-minimal
+scenarios:
+  - name: hello
+    cache_state: none
+  - name: json
+    cache_state: none
+  - name: db-read
+    cache_state: none
+  - name: db-list
+    cache_state: none
+  - name: db-read-cache-warm
+    cache_state: warm
+  - name: db-list-cache-warm
+    cache_state: warm
+repetitions: 5
+warmup:
+  enabled: true
+  requests: 25
+  reset_between_repetitions: true
+load:
+  threads: 2
+  connections: 32
+  duration: 30s
+  timeout: 10s
+services:
+  mariadb:
+    enabled: true
+    dataset_version: v1
+  redis:
+    enabled: true
+cache:
+  reset_before_case: true
+  warm_before_warm_case: true

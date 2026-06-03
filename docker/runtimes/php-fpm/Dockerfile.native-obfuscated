@@ -1,0 +1,20 @@
+ARG PHP_VERSION=8.4
+FROM php:${PHP_VERSION}-fpm
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libzip-dev \
+    && docker-php-ext-install pdo_mysql opcache \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /var/www/app
+
+COPY obfuscation/build/native/minimal/yakpro-po/obfuscated /var/www/app
+COPY docker/runtimes/php-fpm/configure-runtime.sh /usr/local/bin/configure-runtime.sh
+
+RUN chmod +x /usr/local/bin/configure-runtime.sh \
+    && chown -R www-data:www-data /var/www/app
+
+ENTRYPOINT ["/usr/local/bin/configure-runtime.sh"]
+CMD ["php-fpm"]

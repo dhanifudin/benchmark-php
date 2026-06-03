@@ -1,0 +1,22 @@
+ARG PHP_VERSION=8.4
+FROM php:${PHP_VERSION}-apache
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libzip-dev \
+    && docker-php-ext-install pdo_mysql opcache \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && a2enmod rewrite \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /var/www/app
+
+COPY apps/native /var/www/app
+COPY docker/runtimes/mod-php/native-apache.conf /etc/apache2/sites-available/000-default.conf
+COPY docker/runtimes/mod-php/configure-runtime-apache.sh /usr/local/bin/configure-runtime-apache.sh
+
+RUN chmod +x /usr/local/bin/configure-runtime-apache.sh \
+    && chown -R www-data:www-data /var/www/app
+
+ENTRYPOINT ["/usr/local/bin/configure-runtime-apache.sh"]
+CMD ["apache2-foreground"]

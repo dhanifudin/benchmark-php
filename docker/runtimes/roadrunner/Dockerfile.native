@@ -1,0 +1,51 @@
+ARG PHP_VERSION=8.4
+FROM composer:2 AS composer
+
+ARG PHP_VERSION=8.4
+FROM php:${PHP_VERSION}-cli AS builder
+
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libzip-dev \
+    && docker-php-ext-install pdo_mysql opcache sockets \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY apps/native/rr/composer.json /app/rr/composer.json
+
+RUN cd /app/rr \
+    && composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+FROM php:${PHP_VERSION}-cli
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libzip-dev \
+    && docker-php-ext-install pdo_mysql opcache sockets \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG RR_VERSION=2024.3.1
+RUN curl -fsSL https://github.com/roadrunner-server/roadrunner/releases/download/v${RR_VERSION}/roadrunner-${RR_VERSION}-linux-amd64.tar.gz \
+    | tar xz -C /usr/local/bin roadrunner-${RR_VERSION}-linux-amd64/rr \
+    && mv /usr/local/bin/roadrunner-${RR_VERSION}-linux-amd64/rr /usr/local/bin/rr \
+    && rmdir /usr/local/bin/roadrunner-${RR_VERSION}-linux-amd64 \
+    && chmod +x /usr/local/bin/rr
+
+WORKDIR /app
+
+COPY apps/native /app
+COPY --from=builder /app/rr/vendor /app/rr/vendor
+COPY docker/runtimes/roadrunner/configure-runtime-rr.sh /usr/local/bin/configure-runtime-rr.sh
+
+RUN chmod +x /usr/local/bin/configure-runtime-rr.sh \
+    && chown -R www-data:www-data /app
+
+ENV RR_HTTP_PORT=80
+
+ENTRYPOINT ["/usr/local/bin/configure-runtime-rr.sh"]
+CMD ["rr", "serve", "-c", "/app/rr/.rr.yaml"]

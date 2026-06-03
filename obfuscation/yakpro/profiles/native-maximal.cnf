@@ -1,0 +1,41 @@
+<?php
+// YAK Pro - Php Obfuscator: Config File
+
+$conf->parser_mode = 'HOST_VERSION';
+$conf->scramble_mode = 'identifier';
+$conf->scramble_length = 5;
+
+$conf->t_obfuscate_php_extension = array('php');
+
+$conf->obfuscate_constant_name = true;
+$conf->obfuscate_variable_name = true;
+$conf->obfuscate_function_name = true;
+$conf->obfuscate_class_name = true;
+$conf->obfuscate_interface_name = true;
+$conf->obfuscate_trait_name = true;
+$conf->obfuscate_class_constant_name = true;
+$conf->obfuscate_property_name = true;
+$conf->obfuscate_method_name = true;
+$conf->obfuscate_namespace_name = true;
+$conf->obfuscate_label_name = true;
+$conf->obfuscate_if_statement = true;
+$conf->obfuscate_loop_statement = true;
+$conf->obfuscate_string_literal = true;
+
+$conf->shuffle_stmts = true;
+$conf->shuffle_stmts_min_chunk_size = 1;
+$conf->shuffle_stmts_chunk_mode = 'ratio';
+$conf->shuffle_stmts_chunk_ratio = 10;
+$conf->strip_indentation = true;
+$conf->abort_on_error = true;
+$conf->confirm = true;
+$conf->silent = false;
+
+$conf->source_directory = dirname(__DIR__, 3) . '/apps/native';
+$conf->target_directory = dirname(__DIR__, 2) . '/build/native/maximal';
+
+$conf->t_keep = null;
+$conf->t_skip = null;
+$conf->allow_and_overwrite_empty_files = true;
+
+$conf->user_comment = 'Obfuscated for benchmark-php native maximal profile';

@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/benchmark-profile.schema.json",
+  "title": "Benchmark Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "php_profile",
+    "php_versions",
+    "framework_versions",
+    "frameworks",
+    "runtimes",
+    "code_forms",
+    "scenarios",
+    "repetitions",
+    "warmup",
+    "load",
+    "services",
+    "cache"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "php_profile": {
+      "type": "string",
+      "enum": [
+        "latest",
+        "modern-lts",
+        "legacy-lts",
+        "custom"
+      ]
+    },
+    "php_versions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9]+\\.[0-9]+$"
+      }
+    },
+    "framework_versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "native",
+        "laravel",
+        "codeigniter"
+      ],
+      "properties": {
+        "native": {
+          "type": "string"
+        },
+        "laravel": {
+          "type": "string"
+        },
+        "codeigniter": {
+          "type": "string"
+        }
+      }
+    },
+    "frameworks": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "native",
+          "laravel",
+          "codeigniter"
+        ]
+      }
+    },
+    "runtimes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "family",
+          "configs"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "mod_php",
+              "php-fpm",
+              "frankenphp-classic",
+              "frankenphp-worker",
+              "roadrunner",
+              "swoole"
+            ]
+          },
+          "family": {
+            "type": "string",
+            "enum": [
+              "classic",
+              "persistent"
+            ]
+          },
+          "configs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "baseline",
+                "opcache",
+                "opcache-jit-tracing",
+                "opcache-jit-function",
+                "opcache-preload",
+                "opcache-preload-jit-tracing"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "code_forms": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "plain",
+          "obfuscated-supported-minimal",
+          "obfuscated-supported-maximal"
+        ]
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "cache_state"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "hello",
+              "json",
+              "db-read",
+              "db-list",
+              "db-read-cache-warm",
+              "db-list-cache-warm",
+              "compute",
+              "template",
+              "middleware",
+              "db-read-cache-cold",
+              "db-list-cache-cold"
+            ]
+          },
+          "cache_state": {
+            "type": "string",
+            "enum": [
+              "none",
+              "cold",
+              "warm"
+            ]
+          }
+        }
+      }
+    },
+    "repetitions": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "warmup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "requests",
+        "reset_between_repetitions"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "requests": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reset_between_repetitions": {
+          "type": "boolean"
+        }
+      }
+    },
+    "load": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "threads",
+        "connections",
+        "duration",
+        "timeout"
+      ],
+      "properties": {
+        "threads": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "connections": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "duration": {
+          "type": "string",
+          "pattern": "^[0-9]+[smh]$"
+        },
+        "timeout": {
+          "type": "string",
+          "pattern": "^[0-9]+[smh]$"
+        }
+      }
+    },
+    "services": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mariadb",
+        "redis"
+      ],
+      "properties": {
+        "mariadb": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "dataset_version"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "dataset_version": {
+              "type": "string"
+            }
+          }
+        },
+        "redis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "cache": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reset_before_case",
+        "warm_before_warm_case"
+      ],
+      "properties": {
+        "reset_before_case": {
+          "type": "boolean"
+        },
+        "warm_before_warm_case": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

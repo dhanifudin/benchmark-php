@@ -1,0 +1,63 @@
+ARG PHP_VERSION=8.4
+FROM composer:2 AS composer
+
+ARG PHP_VERSION=8.4
+FROM php:${PHP_VERSION}-cli AS builder
+
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libicu-dev libonig-dev libzip-dev \
+    && docker-php-ext-install intl mbstring mysqli opcache pcntl \
+    && pecl install openswoole-25.2.0 \
+    && docker-php-ext-enable openswoole \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY apps/codeigniter /app
+
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+FROM php:${PHP_VERSION}-cli
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libicu-dev libonig-dev libzip-dev \
+    && docker-php-ext-install intl mbstring mysqli opcache pcntl \
+    && pecl install openswoole-25.2.0 \
+    && docker-php-ext-enable openswoole \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --from=builder /app /app
+COPY docker/runtimes/swoole/codeigniter-server.php /app/public/server.php
+COPY docker/runtimes/swoole/configure-runtime-swoole.sh /usr/local/bin/configure-runtime-swoole.sh
+
+RUN chmod +x /usr/local/bin/configure-runtime-swoole.sh \
+    && mkdir -p /app/writable/cache \
+    && mkdir -p /app/writable/logs \
+    && mkdir -p /app/writable/session \
+    && chown -R www-data:www-data /app
+
+ENV SWOOLE_PORT=80
+
+ENTRYPOINT ["/usr/local/bin/configure-runtime-swoole.sh"]
+CMD ["php", "/app/public/server.php"]
+
+WORKDIR /app
+
+COPY --from=builder /app /app
+COPY docker/runtimes/swoole/codeigniter-server.php /app/public/server.php
+COPY docker/runtimes/swoole/configure-runtime-swoole.sh /usr/local/bin/configure-runtime-swoole.sh
+
+RUN chmod +x /usr/local/bin/configure-runtime-swoole.sh \
+    && mkdir -p /app/writable/cache \
+    && mkdir -p /app/writable/logs \
+    && mkdir -p /app/writable/session \
+    && chown -R www-data:www-data /app
+
+ENV SWOOLE_PORT=80
+
+ENTRYPOINT ["/usr/local/bin/configure-runtime-swoole.sh"]
+CMD ["php", "/app/public/server.php"]

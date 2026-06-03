@@ -1,0 +1,12 @@
+.env.local
+.env.override
+vendor/
+node_modules/
+results/raw/*
+results/processed/*
+results/reports/*
+results/figures/*
+!results/raw/.gitkeep
+!results/processed/.gitkeep
+!results/reports/.gitkeep
+!results/figures/.gitkeep

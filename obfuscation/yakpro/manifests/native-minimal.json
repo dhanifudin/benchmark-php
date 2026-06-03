@@ -1,0 +1,16 @@
+{
+    "profile": "native-minimal",
+  "tool": {
+      "name": "yakpro-po",
+      "version_ref": "2.0.17",
+      "php_parser_ref": "v4.9.1"
+  },
+  "source_directory": "apps/native",
+  "output_directory": "obfuscation/build/native/minimal/yakpro-po/obfuscated",
+  "code_form": "obfuscated-supported-minimal",
+  "notes": [
+    "Native pilot uses a conservative YAK Pro profile.",
+    "Only variable names and string literals are obfuscated.",
+    "Function and class renaming remain disabled for compatibility-first benchmarking."
+  ]
+}

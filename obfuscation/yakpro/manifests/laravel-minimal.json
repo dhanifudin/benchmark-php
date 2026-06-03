@@ -1,0 +1,17 @@
+{
+  "profile": "laravel-minimal",
+  "tool": {
+    "name": "yakpro-po",
+    "version_ref": "2.0.17",
+    "php_parser_ref": "v4.9.1"
+  },
+  "source_directory": "apps/laravel",
+  "output_directory": "obfuscation/build/laravel/minimal/app-obfuscated",
+  "code_form": "obfuscated-supported-minimal",
+  "notes": [
+    "Only routes/web.php is obfuscated (handler logic).",
+    "Variable names and string literals are scrambled.",
+    "The rest of the Laravel app is copied unmodified from apps/laravel.",
+    "Function/class/method renaming disabled for Laravel compatibility."
+  ]
+}

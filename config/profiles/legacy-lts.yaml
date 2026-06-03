@@ -1,0 +1,62 @@
+name: legacy-lts
+php_profile: legacy-lts
+php_versions:
+  - "7.4"
+description: >-
+  Legacy compatibility profile for Indonesian-relevant PHP 7.4 deployments.
+  This profile uses Laravel 8.x as the latest Laravel line that supports PHP 7.4
+  and keeps the runtime matrix intentionally narrow.
+framework_versions:
+  native: 7.4 runtime baseline
+  laravel: 8.x latest patch
+  codeigniter: latest-supported-on-7.4
+frameworks:
+  - native
+  - laravel
+  - codeigniter
+runtimes:
+  - name: mod_php
+    family: classic
+    configs:
+      - baseline
+      - opcache
+  - name: php-fpm
+    family: classic
+    configs:
+      - baseline
+      - opcache
+code_forms:
+  - plain
+  - obfuscated-supported-minimal
+scenarios:
+  - name: hello
+    cache_state: none
+  - name: json
+    cache_state: none
+  - name: db-read
+    cache_state: none
+  - name: db-list
+    cache_state: none
+  - name: db-read-cache-warm
+    cache_state: warm
+  - name: db-list-cache-warm
+    cache_state: warm
+repetitions: 5
+warmup:
+  enabled: true
+  requests: 25
+  reset_between_repetitions: true
+load:
+  threads: 2
+  connections: 32
+  duration: 30s
+  timeout: 10s
+services:
+  mariadb:
+    enabled: true
+    dataset_version: v1
+  redis:
+    enabled: true
+cache:
+  reset_before_case: true
+  warm_before_warm_case: true

@@ -1,0 +1,38 @@
+<?php
+// YAK Pro - Php Obfuscator: Config File
+
+$conf->parser_mode = 'HOST_VERSION';
+$conf->scramble_mode = 'identifier';
+$conf->scramble_length = 5;
+
+$conf->t_obfuscate_php_extension = array('php');
+
+$conf->obfuscate_constant_name = false;
+$conf->obfuscate_variable_name = true;
+$conf->obfuscate_function_name = false;
+$conf->obfuscate_class_name = false;
+$conf->obfuscate_interface_name = false;
+$conf->obfuscate_trait_name = false;
+$conf->obfuscate_class_constant_name = false;
+$conf->obfuscate_property_name = false;
+$conf->obfuscate_method_name = false;
+$conf->obfuscate_namespace_name = false;
+$conf->obfuscate_label_name = false;
+$conf->obfuscate_if_statement = false;
+$conf->obfuscate_loop_statement = false;
+$conf->obfuscate_string_literal = true;
+
+$conf->shuffle_stmts = false;
+$conf->strip_indentation = true;
+$conf->abort_on_error = true;
+$conf->confirm = true;
+$conf->silent = false;
+
+$conf->source_directory = '.';
+$conf->target_directory = '.';
+
+$conf->t_skip = null;
+$conf->t_keep = null;
+$conf->allow_and_overwrite_empty_files = true;
+
+$conf->user_comment = 'Obfuscated for benchmark-php codeigniter minimal profile';

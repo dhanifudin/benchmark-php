@@ -1,0 +1,4 @@
+FROM nginx:1.27-alpine
+
+COPY docker/runtimes/php-fpm/native-nginx.conf /etc/nginx/conf.d/default.conf
+COPY apps/native/public /var/www/app/public

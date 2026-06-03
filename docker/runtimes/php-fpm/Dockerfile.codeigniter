@@ -1,0 +1,29 @@
+ARG PHP_VERSION=8.4
+FROM composer:2 AS composer
+
+ARG PHP_VERSION=8.4
+FROM php:${PHP_VERSION}-fpm
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libicu-dev libonig-dev libzip-dev \
+    && docker-php-ext-install intl mbstring mysqli opcache \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/app
+
+COPY apps/codeigniter /var/www/app
+COPY docker/runtimes/php-fpm/configure-runtime.sh /usr/local/bin/configure-runtime.sh
+
+RUN chmod +x /usr/local/bin/configure-runtime.sh \
+    && composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
+    && mkdir -p /var/www/app/writable/cache \
+    && mkdir -p /var/www/app/writable/logs \
+    && mkdir -p /var/www/app/writable/session \
+    && chown -R www-data:www-data /var/www/app
+
+ENTRYPOINT ["/usr/local/bin/configure-runtime.sh"]
+CMD ["php-fpm"]

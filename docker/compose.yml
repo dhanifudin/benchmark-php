@@ -1,0 +1,536 @@
+services:
+  mariadb:
+    image: mariadb:${MARIADB_VERSION}
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    ports:
+      - "${MARIADB_PORT}:3306"
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MARIADB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ./services/mariadb/initdb:/docker-entrypoint-initdb.d:ro
+      - mariadb-data:/var/lib/mysql
+
+  redis:
+    image: redis:${REDIS_VERSION}
+    ports:
+      - "${REDIS_PORT}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  wrk:
+    image: ${WRK_IMAGE}
+    entrypoint: ["sh", "-lc"]
+    command:
+      - |
+        echo "wrk runner container is available for scripted benchmark runs."
+
+  native-php-fpm:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.native
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${NATIVE_PHP_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  native-nginx:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.native-nginx
+    depends_on:
+      native-php-fpm:
+        condition: service_started
+    ports:
+      - "${NATIVE_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  native-modphp:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/mod-php/Dockerfile.native
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${NATIVE_MODPHP_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${NATIVE_MODPHP_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  native-frankenphp:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/frankenphp-classic/Dockerfile.native
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${NATIVE_FRANKENPHP_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${NATIVE_FRANKENPHP_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  native-frankenphp-worker:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/frankenphp-worker/Dockerfile.native
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${NATIVE_FRANKENPHP_WORKER_RUNTIME_CONFIG}
+      MAX_REQUESTS: 0
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${NATIVE_FRANKENPHP_WORKER_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  native-obfuscated-php-fpm:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.native-obfuscated
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      BENCHMARK_FRAMEWORK_VERSION: native-yakpro-minimal
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${NATIVE_OBFUSCATED_PHP_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  native-obfuscated-nginx:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.native-obfuscated-nginx
+    depends_on:
+      native-obfuscated-php-fpm:
+        condition: service_started
+    ports:
+      - "${NATIVE_OBFUSCATED_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  native-maximal-php-fpm:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.native-maximal
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      BENCHMARK_FRAMEWORK_VERSION: native-yakpro-maximal
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${NATIVE_MAXIMAL_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  native-maximal-nginx:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.native-maximal-nginx
+    depends_on:
+      native-maximal-php-fpm:
+        condition: service_started
+    ports:
+      - "${NATIVE_MAXIMAL_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  laravel-php-fpm:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.laravel
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      APP_DEBUG: "false"
+      APP_URL: http://laravel-nginx
+      DB_CONNECTION: mysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      SESSION_DRIVER: file
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: null
+      PHP_RUNTIME_CONFIG: ${LARAVEL_PHP_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  laravel-nginx:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.laravel-nginx
+    depends_on:
+      laravel-php-fpm:
+        condition: service_started
+    ports:
+      - "${LARAVEL_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  laravel-obfuscated-php-fpm:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.laravel-obfuscated
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      APP_DEBUG: "false"
+      APP_URL: http://laravel-obfuscated-nginx
+      DB_CONNECTION: mysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      SESSION_DRIVER: file
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: null
+      PHP_RUNTIME_CONFIG: ${LARAVEL_OBFUSCATED_PHP_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  laravel-obfuscated-nginx:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.laravel-obfuscated-nginx
+    depends_on:
+      laravel-obfuscated-php-fpm:
+        condition: service_started
+    ports:
+      - "${LARAVEL_OBFUSCATED_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  codeigniter-php-fpm:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.codeigniter
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      CI_ENVIRONMENT: production
+      app.baseURL: http://codeigniter-nginx/
+      DB_HOST: mariadb
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      DB_DRIVER: MySQLi
+      DB_PORT: 3306
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${CODEIGNITER_PHP_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  codeigniter-nginx:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.codeigniter-nginx
+    depends_on:
+      codeigniter-php-fpm:
+        condition: service_started
+    ports:
+      - "${CODEIGNITER_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  codeigniter-obfuscated-php-fpm:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.codeigniter-obfuscated
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      CI_ENVIRONMENT: production
+      app.baseURL: http://codeigniter-obfuscated-nginx/
+      DB_HOST: mariadb
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      DB_DRIVER: MySQLi
+      DB_PORT: 3306
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${CODEIGNITER_OBFUSCATED_PHP_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  codeigniter-obfuscated-nginx:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/php-fpm/Dockerfile.codeigniter-obfuscated-nginx
+    depends_on:
+      codeigniter-obfuscated-php-fpm:
+        condition: service_started
+    ports:
+      - "${CODEIGNITER_OBFUSCATED_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  native-roadrunner:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/roadrunner/Dockerfile.native
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${NATIVE_ROADRUNNER_RUNTIME_CONFIG}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${NATIVE_ROADRUNNER_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  native-swoole:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/swoole/Dockerfile.native
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${NATIVE_SWOOLE_RUNTIME_CONFIG}
+      SWOOLE_PORT: 80
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${NATIVE_SWOOLE_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  laravel-swoole:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/swoole/Dockerfile.laravel
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      APP_ENV: benchmark
+      APP_DEBUG: "false"
+      APP_URL: http://laravel-swoole
+      DB_CONNECTION: mysql
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      SESSION_DRIVER: file
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: null
+      PHP_RUNTIME_CONFIG: ${LARAVEL_SWOOLE_RUNTIME_CONFIG}
+      SWOOLE_PORT: 80
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${LARAVEL_SWOOLE_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  codeigniter-swoole:
+    build:
+      context: ..
+      dockerfile: docker/runtimes/swoole/Dockerfile.codeigniter
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    environment:
+      CI_ENVIRONMENT: production
+      app.baseURL: http://codeigniter-swoole/
+      DB_HOST: mariadb
+      DB_DATABASE: ${MARIADB_DATABASE}
+      DB_USERNAME: ${MARIADB_USER}
+      DB_PASSWORD: ${MARIADB_PASSWORD}
+      DB_DRIVER: MySQLi
+      DB_PORT: 3306
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PHP_RUNTIME_CONFIG: ${CODEIGNITER_SWOOLE_RUNTIME_CONFIG}
+      SWOOLE_PORT: 80
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${CODEIGNITER_SWOOLE_HTTP_PORT}:80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/healthz | grep -q 'ok'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mariadb-data:

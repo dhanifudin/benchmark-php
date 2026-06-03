@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/raw-run.schema.json",
+  "title": "Raw Benchmark Run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "benchmark_case_id",
+    "profile",
+    "environment",
+    "workload",
+    "timing",
+    "metrics",
+    "artifacts"
+  ],
+  "properties": {
+    "benchmark_case_id": {
+      "type": "string"
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "php_profile",
+        "fingerprint"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "php_profile": {
+          "type": "string"
+        },
+        "fingerprint": {
+          "type": "string"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "framework",
+        "framework_version",
+        "php_version",
+        "runtime_family",
+        "runtime",
+        "runtime_config",
+        "code_form",
+        "obfuscation_profile",
+        "dataset_version",
+        "repetition"
+      ],
+      "properties": {
+        "framework": {
+          "type": "string"
+        },
+        "framework_version": {
+          "type": "string"
+        },
+        "php_version": {
+          "type": "string"
+        },
+        "runtime_family": {
+          "type": "string"
+        },
+        "runtime": {
+          "type": "string"
+        },
+        "runtime_config": {
+          "type": "string"
+        },
+        "code_form": {
+          "type": "string"
+        },
+        "obfuscation_profile": {
+          "type": "string"
+        },
+        "dataset_version": {
+          "type": "string"
+        },
+        "repetition": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scenario",
+        "cache_state",
+        "threads",
+        "connections",
+        "duration",
+        "timeout"
+      ],
+      "properties": {
+        "scenario": {
+          "type": "string"
+        },
+        "cache_state": {
+          "type": "string"
+        },
+        "threads": {
+          "type": "integer"
+        },
+        "connections": {
+          "type": "integer"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "timeout": {
+          "type": "string"
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "started_at",
+        "finished_at"
+      ],
+      "properties": {
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requests_per_second",
+        "latency_avg_ms",
+        "latency_p50_ms",
+        "latency_p95_ms",
+        "latency_p99_ms",
+        "non_2xx_count",
+        "error_count"
+      ],
+      "properties": {
+        "requests_per_second": {
+          "type": "number"
+        },
+        "latency_avg_ms": {
+          "type": "number"
+        },
+        "latency_p50_ms": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "latency_p95_ms": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "latency_p99_ms": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "non_2xx_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "error_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bytes_per_second": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "memory_peak_mb": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wrk_stdout_path"
+      ],
+      "properties": {
+        "wrk_stdout_path": {
+          "type": "string"
+        },
+        "runtime_log_path": {
+          "type": "string"
+        },
+        "verification_log_path": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
