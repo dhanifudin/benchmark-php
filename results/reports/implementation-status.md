@@ -1,39 +1,53 @@
 # Implementation Status
 
-**Last updated**: 2026-06-03 07:51 UTC
-**Total**: 178 cells, 207 runs
+**Last updated**: 2026-06-03 20:43 UTC
+**Total**: 228 cells, 294 runs
 
-## Scenario Coverage (out of 11)
+## Scenario Coverage (out of 15)
+
 | Framework | Runtime | Config | Code Form | Coverage |
 |-----------|---------|--------|-----------|----------|
-| codeigniter | php-fpm                | baseline | obfuscated-supported-minimal   |  6/11 ███ |
-| codeigniter | php-fpm                | opcache | obfuscated-supported-minimal   |  6/11 ███ |
-| codeigniter | php-fpm                | baseline | plain                          |  9/11 ████▌ |
-| codeigniter | php-fpm                | opcache | plain                          |  9/11 ████▌ |
-| laravel   | php-fpm                | baseline | obfuscated-supported-minimal   |  6/11 ███ |
-| laravel   | php-fpm                | opcache | obfuscated-supported-minimal   |  6/11 ███ |
-| laravel   | php-fpm                | baseline | plain                          |  9/11 ████▌ |
-| laravel   | php-fpm                | opcache | plain                          |  9/11 ████▌ |
-| laravel   | swoole                 | baseline | plain                          |  6/11 ███ |
-| native    | frankenphp-classic     | baseline | plain                          |  6/11 ███ |
-| native    | frankenphp-classic     | opcache | plain                          |  6/11 ███ |
-| native    | frankenphp-worker      | baseline | plain                          |  6/11 ███ |
-| native    | frankenphp-worker      | opcache | plain                          |  6/11 ███ |
-| native    | mod_php                | baseline | plain                          |  9/11 ████▌ |
-| native    | mod_php                | opcache | plain                          |  6/11 ███ |
-| native    | php-fpm                | baseline | obfuscated-supported-maximal   |  6/11 ███ |
-| native    | php-fpm                | baseline | obfuscated-supported-minimal   |  6/11 ███ |
-| native    | php-fpm                | opcache | obfuscated-supported-minimal   |  6/11 ███ |
-| native    | php-fpm                | baseline | plain                          | 11/11 █████▌ |
-| native    | php-fpm                | opcache | plain                          | 11/11 █████▌ |
-| native    | php-fpm                | opcache-jit-tracing | plain                          |  3/11 █▌ |
-| native    | roadrunner             | baseline | plain                          |  9/11 ████▌ |
-| native    | roadrunner             | opcache | plain                          |  6/11 ███ |
-| native    | swoole                 | baseline | plain                          |  9/11 ████▌ |
-| native    | swoole                 | opcache | plain                          |  6/11 ███ |
+| native | php-fpm | baseline | plain | 15/15 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ |
+| native | php-fpm | opcache | plain | 13/15 ▓▓▓▓▓▓▓▓▓▓▓▓▓░░ |
+| native | mod_php | baseline | plain | 13/15 ▓▓▓▓▓▓▓▓▓▓▓▓▓░░ |
+| native | swoole | baseline | plain | 13/15 ▓▓▓▓▓▓▓▓▓▓▓▓▓░░ |
+| native | roadrunner | baseline | plain | 11/15 ▓▓▓▓▓▓▓▓▓▓▓░░░░ |
+| native | frankenphp-classic | baseline + opcache | plain | 13/15 ▓▓▓▓▓▓▓▓▓▓▓▓▓░░ |
+| native | frankenphp-worker | baseline + opcache | plain | 13/15 ▓▓▓▓▓▓▓▓▓▓▓▓▓░░ |
+| laravel | php-fpm | baseline + opcache | plain | 13/15 ▓▓▓▓▓▓▓▓▓▓▓▓▓░░ |
+| codeigniter | php-fpm | baseline + opcache | plain | 13/15 ▓▓▓▓▓▓▓▓▓▓▓▓▓░░ |
 
-## Remaining Gaps
-- Cold-cache (db-read-cache-cold, db-list-cache-cold): missing on most non-native targets
-- Extended scenarios on obfuscated code forms: low priority
-- JIT tracing: native plain only (3/11)
-- Framework runtimes beyond php-fpm: Laravel Swoole Octane done, CI incompatible
+## Multi-Rep Validation (n≥5)
+
+| Cell | RSD |
+|---|---|
+| swoole × hello | 2.0% |
+| swoole × db-read | 0.2% |
+| php-fpm × db-create | 1.4% |
+| php-fpm × json | 4.8% |
+| php-fpm × hello | 15.6% |
+| mod_php × hello | 18.1% |
+| php-fpm × db-read | 19.6% |
+| mod_php × db-read | 35.9% |
+
+## New in v2
+
+| Item | Status |
+|---|---|
+| Matrix runner (multi-runtime, profile-driven) | Done |
+| Aggregation script (median, stdev, RSD, IQR) | Done |
+| DB seed reset for write benchmarks | Done |
+| 4 CRUD scenarios across 3 frameworks | Done |
+| 35 multi-rep runs across 3 runtimes | Done |
+| Container telemetry | Not started |
+| Concurrency-level benchmarks (8/32/128) | Not started |
+
+## Remaining
+
+| Item | Status |
+|---|---|
+| Multi-PHP-version for frameworks | Not started |
+| Maximal obfuscation for frameworks | Not started |
+| Full multi-rep for all cells | 8 cells with n≥5 |
+| RoadRunner + Swoole framework targets | Laravel Swoole Octane done |
+| JIT tracing full coverage | 3/15 |

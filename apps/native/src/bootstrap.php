@@ -116,12 +116,70 @@ function fetch_posts_list(): array
     return $statement->fetchAll();
 }
 
+function fetch_post_by_id(int $id): array
+{
+    $statement = db_connection()->prepare(
+        'SELECT id, user_id, title, body, is_published, created_at FROM posts WHERE id = :id LIMIT 1'
+    );
+    $statement->execute(['id' => $id]);
+    $post = $statement->fetch();
+
+    if (!is_array($post)) {
+        throw new RuntimeException('Post not found');
+    }
+
+    return $post;
+}
+
+function create_post(array $input): array
+{
+    $userId = (int) ($input['user_id'] ?? 1);
+    $title = (string) ($input['title'] ?? 'Untitled');
+    $body = (string) ($input['body'] ?? '');
+
+    $statement = db_connection()->prepare(
+        'INSERT INTO posts (user_id, title, body, is_published, created_at) VALUES (:user_id, :title, :body, 1, NOW())'
+    );
+    $statement->execute(['user_id' => $userId, 'title' => $title, 'body' => $body]);
+
+    return fetch_post_by_id((int) db_connection()->lastInsertId());
+}
+
+function update_post(int $id, array $input): array
+{
+    $title = (string) ($input['title'] ?? 'Updated');
+    $body = (string) ($input['body'] ?? 'Updated');
+
+    $statement = db_connection()->prepare(
+        'UPDATE posts SET title = :title, body = :body WHERE id = :id'
+    );
+    $statement->execute(['title' => $title, 'body' => $body, 'id' => $id]);
+
+    return fetch_post_by_id($id);
+}
+
+function delete_post(int $id): array
+{
+    $post = fetch_post_by_id($id);
+
+    $statement = db_connection()->prepare('DELETE FROM posts WHERE id = :id');
+    $statement->execute(['id' => $id]);
+
+    return ['deleted' => $post];
+}
+
 function app_handle_request(): void
 {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
     $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $input = null;
 
-    if ($method !== 'GET') {
+    if (in_array($method, ['POST', 'PUT', 'DELETE'], true)) {
+        $body = file_get_contents('php://input') ?: '{}';
+        $input = json_decode($body, true) ?: [];
+    }
+
+    if (!in_array($method, ['GET', 'POST', 'PUT', 'DELETE'], true)) {
         json_response([
             'error' => 'method_not_allowed',
         ], 405);
@@ -247,6 +305,46 @@ function app_handle_request(): void
                         'context' => $context,
                         'elapsed_ns' => hrtime(true) - $started,
                     ],
+                ]);
+                return;
+
+            case '/db-read-by-id':
+                json_response([
+                    'meta' => app_metadata(),
+                    'data' => ['post' => fetch_post_by_id(5)],
+                ]);
+                return;
+
+            case '/db-create':
+                if ($method !== 'POST') {
+                    json_response(['error' => 'method_not_allowed'], 405);
+                    return;
+                }
+                json_response([
+                    'meta' => app_metadata(),
+                    'data' => ['post' => create_post($input ?: [])],
+                ], 201);
+                return;
+
+            case '/db-update':
+                if ($method !== 'PUT') {
+                    json_response(['error' => 'method_not_allowed'], 405);
+                    return;
+                }
+                json_response([
+                    'meta' => app_metadata(),
+                    'data' => ['post' => update_post(1, $input ?: [])],
+                ]);
+                return;
+
+            case '/db-delete':
+                if ($method !== 'DELETE') {
+                    json_response(['error' => 'method_not_allowed'], 405);
+                    return;
+                }
+                json_response([
+                    'meta' => app_metadata(),
+                    'data' => delete_post(20),
                 ]);
                 return;
 

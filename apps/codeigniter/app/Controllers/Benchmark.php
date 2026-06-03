@@ -248,4 +248,95 @@ class Benchmark extends BaseController
             ],
         ]);
     }
+
+    public function dbReadById(int $id = 5): ResponseInterface
+    {
+        try {
+            return $this->response->setJSON([
+                'meta' => $this->metadata(),
+                'data' => ['post' => $this->fetchBenchmarkPost($id)],
+            ]);
+        } catch (Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    public function dbCreate(): ResponseInterface
+    {
+        try {
+            $input = $this->request->getJSON(true) ?: [];
+            $userId = (int) ($input['user_id'] ?? 1);
+            $title = (string) ($input['title'] ?? 'Untitled');
+            $body = (string) ($input['body'] ?? '');
+
+            $this->db()->table('posts')->insert([
+                'user_id' => $userId,
+                'title' => $title,
+                'body' => $body,
+                'is_published' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+
+            $postId = (int) $this->db()->insertID();
+
+            return $this->response->setStatusCode(201)->setJSON([
+                'meta' => $this->metadata(),
+                'data' => ['post' => $this->fetchBenchmarkPost($postId)],
+            ]);
+        } catch (Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    public function dbUpdate(int $id = 1): ResponseInterface
+    {
+        try {
+            $input = $this->request->getJSON(true) ?: [];
+            $title = (string) ($input['title'] ?? 'Updated');
+            $body = (string) ($input['body'] ?? 'Updated');
+
+            $this->db()->table('posts')->where('id', $id)->update([
+                'title' => $title,
+                'body' => $body,
+            ]);
+
+            return $this->response->setJSON([
+                'meta' => $this->metadata(),
+                'data' => ['post' => $this->fetchBenchmarkPost($id)],
+            ]);
+        } catch (Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    public function dbDelete(int $id = 20): ResponseInterface
+    {
+        try {
+            $post = $this->fetchBenchmarkPost($id);
+            $this->db()->table('posts')->where('id', $id)->delete();
+
+            return $this->response->setJSON([
+                'meta' => $this->metadata(),
+                'data' => ['deleted' => $post],
+            ]);
+        } catch (Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    private function fetchBenchmarkPost(int $id): array
+    {
+        $row = $this->db()
+            ->table('posts')
+            ->select(['id', 'user_id', 'title', 'body', 'is_published', 'created_at'])
+            ->where('id', $id)
+            ->get()
+            ->getRowArray();
+
+        if (!is_array($row)) {
+            throw new RuntimeException('Post not found');
+        }
+
+        return $row;
+    }
 }

@@ -14,3 +14,7 @@ $routes->get('db-list-cache-warm', 'Benchmark::dbListCacheWarm');
 $routes->get('compute', 'Benchmark::compute');
 $routes->get('template', 'Benchmark::template');
 $routes->get('middleware', 'Benchmark::middleware');
+$routes->get('db-read-by-id', 'Benchmark::dbReadById');
+$routes->post('db-create', 'Benchmark::dbCreate');
+$routes->put('db-update', 'Benchmark::dbUpdate');
+$routes->delete('db-delete', 'Benchmark::dbDelete');

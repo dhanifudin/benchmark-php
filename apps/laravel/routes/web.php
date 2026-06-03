@@ -33,6 +33,27 @@ function fetchBenchmarkUser(): array
     ];
 }
 
+function fetchBenchmarkPost(int $id): array
+{
+    $post = DB::table('posts')
+        ->select(['id', 'user_id', 'title', 'body', 'is_published', 'created_at'])
+        ->where('id', $id)
+        ->first();
+
+    if ($post === null) {
+        abort(500, 'Post not found');
+    }
+
+    return [
+        'id' => $post->id,
+        'user_id' => $post->user_id,
+        'title' => $post->title,
+        'body' => $post->body,
+        'is_published' => $post->is_published,
+        'created_at' => (string) $post->created_at,
+    ];
+}
+
 Route::get('/healthz', fn () => response('ok', 200)->header('Content-Type', 'text/plain; charset=utf-8'));
 
 Route::get('/hello', fn () => response('hello world', 200)->header('Content-Type', 'text/plain; charset=utf-8'));
@@ -153,5 +174,44 @@ Route::get('/middleware', function () {
             'context' => ['request_id' => uniqid('req-', true), 'steps' => 3],
             'elapsed_ns' => hrtime(true) - $started,
         ],
+    ]);
+});
+
+Route::get('/db-read-by-id', fn() => response()->json([
+    'meta' => benchmarkMetadata(),
+    'data' => ['post' => fetchBenchmarkPost(5)],
+]));
+
+Route::post('/db-create', function () {
+    $post = DB::table('posts')->insertGetId([
+        'user_id' => request()->json('user_id', 1),
+        'title' => request()->json('title', 'Untitled'),
+        'body' => request()->json('body', ''),
+        'is_published' => 1,
+        'created_at' => now(),
+    ]);
+    return response()->json([
+        'meta' => benchmarkMetadata(),
+        'data' => ['post' => fetchBenchmarkPost($post)],
+    ], 201);
+});
+
+Route::put('/db-update', function () {
+    DB::table('posts')->where('id', 1)->update([
+        'title' => request()->json('title', 'Updated'),
+        'body' => request()->json('body', 'Updated'),
+    ]);
+    return response()->json([
+        'meta' => benchmarkMetadata(),
+        'data' => ['post' => fetchBenchmarkPost(1)],
+    ]);
+});
+
+Route::delete('/db-delete', function () {
+    $post = fetchBenchmarkPost(20);
+    DB::table('posts')->where('id', 20)->delete();
+    return response()->json([
+        'meta' => benchmarkMetadata(),
+        'data' => ['deleted' => $post],
     ]);
 });
