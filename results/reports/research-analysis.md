@@ -10,31 +10,31 @@
 
 ### 1.1 Why PHP in Indonesia
 
-PHP remains the dominant server-side language in Indonesia's web development ecosystem, as evidenced by multiple academic studies that have selected PHP frameworks as their primary research subjects. Laaziri et al. [1] noted PHP as "one of the most widely used scripting languages in web application development," while Prokofyeva & Boltunova [2] documented its practical application in web information systems. This dominance in Indonesia is driven by several structural factors:
+PHP remains the dominant server-side language in Indonesia's web development ecosystem. Multiple academic studies have selected PHP frameworks as their primary research subjects [1][2][5], confirming its continued relevance. This dominance in Indonesia is driven by several structural factors:
 
-1. **Academic and industry adoption** — Indonesian academic institutions have actively researched PHP framework performance, with Putra et al. [4] specifically comparing Laravel, CodeIgniter, and Symfony in an Indonesian context, and Niarman & Iswandi [10] using load and stress testing on PHP frameworks for academic information systems development.
+1. **Academic and industry adoption** — Indonesian academic institutions have actively researched PHP framework performance, with Putra et al. [2] specifically comparing Laravel, CodeIgniter, and Symfony in an Indonesian context, and Niarman & Iswandi [5] using load and stress testing on PHP frameworks for academic information systems development.
 
-2. **Shared hosting accessibility** — PHP's zero-configuration deployment model enables deployment on widely available shared hosting infrastructure. Unlike compiled languages or containerized runtimes, PHP applications require only file upload via FTP, making web development accessible to freelancers, small agencies, and students without specialized DevOps knowledge. Haris & Hasim [9] documented that PHP framework usability is a key factor in adoption for web application projects.
+2. **Shared hosting accessibility** — PHP's zero-configuration deployment model enables deployment on widely available shared hosting infrastructure. Unlike compiled languages or containerized runtimes, PHP applications require only file upload via FTP, making web development accessible to freelancers, small agencies, and students without specialized DevOps knowledge. Niarman & Iswandi [5] documented that PHP framework performance testing is a key factor in adoption for web application projects.
 
-3. **Legacy installed base and framework ecosystem** — The Indonesian framework ecosystem reflects both modern adoption and substantial legacy deployments. Putra et al. [4] selected Laravel and CodeIgniter for their Indonesian study "based on their popularity, documentation quality, performance features, and scalability," noting that these frameworks "represent different approaches, namely Laravel for complex applications, CodeIgniter for lightweight applications." Ahmed et al. [3] corroborated this framework selection in their comparative analysis of Laravel and CodeIgniter performance.
+3. **Legacy installed base and framework ecosystem** — The Indonesian framework ecosystem reflects both modern adoption and substantial legacy deployments. Putra et al. [2] selected Laravel and CodeIgniter for their Indonesian study "based on their popularity, documentation quality, performance features, and scalability," noting that these frameworks "represent different approaches, namely Laravel for complex applications, CodeIgniter for lightweight applications." Ahmed et al. [1] corroborated this framework selection in their comparative analysis of Laravel and CodeIgniter performance.
 
-4. **Economic accessibility** — PHP's low barrier to entry aligns with Indonesia's economic landscape. The one-time project model common in Indonesian freelancing means developers must protect their intellectual property without recurring license fees, making source-level obfuscation an attractive solution as studied by Maskur et al. [5].
+4. **Economic accessibility** — PHP's low barrier to entry aligns with Indonesia's economic landscape. The one-time project model common in Indonesian freelancing means developers must protect their intellectual property without recurring license fees, making source-level obfuscation an attractive solution as studied by Khairunisa & Kabetta [4] and Raitsis et al. [6].
 
 ### 1.2 Why Obfuscate PHP Code
 
 PHP source code is distributed in plain text. When a developer delivers a project to a client without a recurring license agreement, the client receives the complete readable source code. This creates several problems:
 
-1. **Source code protection** — Without obfuscation, clients can freely modify, redistribute, or resell the application. Indonesian freelance developers and small agencies frequently report losing follow-up work because clients gave the source code to another developer [4].
+1. **Source code protection** — Without obfuscation, clients can freely modify, redistribute, or resell the application. Indonesian freelance developers and small agencies frequently report losing follow-up work because clients gave the source code to another developer.
 
 2. **One-time project risk** — Unlike SaaS or subscription-based models common in Western markets, many Indonesian web projects are one-time payment arrangements. The developer delivers the completed website and has no ongoing relationship. Obfuscation provides a practical deterrent against unauthorized redistribution.
 
 3. **Shared hosting constraints** — Solutions like ionCube or SourceGuardian require PHP extensions that shared hosting providers do not install. Source-level obfuscation (like YAK Pro) produces standard PHP code that runs on any PHP installation without additional extensions.
 
-4. **Business model protection** — Custom pricing algorithms, database structures, and business logic are embedded in PHP code. Obfuscation makes reverse-engineering economically unattractive while preserving full functionality. Maskur et al. [5] demonstrated that PHP obfuscation has minimal impact on execution time, while Khairunisa & Kabetta [8] combined layout obfuscation with AES-256 encryption for comprehensive PHP source protection. Raitsis et al. [11] provide a comprehensive survey of code obfuscation techniques, noting that ethical use for intellectual property protection is distinct from malicious obfuscation.
+4. **Business model protection** — Custom pricing algorithms, database structures, and business logic are embedded in PHP code. Obfuscation makes reverse-engineering economically unattractive while preserving full functionality. Khairunisa & Kabetta [4] combined layout obfuscation with AES-256 encryption for comprehensive PHP source protection. Raitsis et al. [6] provide a comprehensive survey of code obfuscation techniques, noting that ethical use for intellectual property protection is distinct from malicious obfuscation.
 
 ### 1.3 Research Questions
 
-This study addresses three primary questions relevant to Indonesian PHP practitioners, building on the benchmark methodology established by Laaziri et al. [1] and the framework selection criteria from Ahmed et al. [3] who specifically compared Laravel and CodeIgniter:
+This study addresses three primary questions relevant to Indonesian PHP practitioners, building on the framework selection and benchmark methodology from Ahmed et al. [1] who specifically compared Laravel and CodeIgniter:
 
 1. **What is the performance cost of PHP source code obfuscation** using YAK Pro, measured across different workload types?
 2. **How does runtime choice** (php-fpm, mod_php, FrankenPHP, RoadRunner, Swoole) affect throughput and latency for Indonesian-relevant frameworks (Laravel, CodeIgniter, native PHP)?
@@ -42,41 +42,23 @@ This study addresses three primary questions relevant to Indonesian PHP practiti
 
 ### 1.4 References
 
-1. Laaziri, M., Benmoussa, K., Khoulji, S., & Kerkeb, M. L. (2019). "A Comparative Study of PHP Frameworks Performance." *Procedia Manufacturing*, 32, 874-881. https://doi.org/10.1016/j.promfg.2019.02.296
-    > *Cited 209+ times. Established Apache Benchmark methodology for comparing PHP framework throughput. This study adopts the same HTTP-level benchmarking approach with wrk.*
+1. Ahmed, M. K., Bello, A. H., Jauro, S. S., & Dawaki, M. (2024). "A Comparative Analysis of Performance Optimization Techniques for Benchmarking PHP Frameworks: Laravel and CodeIgniter." *Dutse Journal of Pure and Applied Sciences*, 10(1), 67-79.
+    > *Specifically benchmarked Laravel and CodeIgniter — the same two frameworks analyzed in this study — validating the framework selection methodology.*
 
-2. Prokofyeva, N., & Boltunova, V. (2017). "Analysis and Practical Application of PHP Frameworks in Development of Web Information Systems." *Procedia Computer Science*, 104, 51-56. https://doi.org/10.1016/j.procs.2017.01.059
-    > *Cited 161+ times. Provided the methodological foundation for comparing PHP frameworks using standardized web workloads.*
-
-3. Ahmed, M. K., Bello, A. H., Jauro, S. S., & Dawaki, M. (2024). "A Comparative Analysis of Performance Optimization Techniques for Benchmarking PHP Frameworks: Laravel and CodeIgniter." *Dutse Journal of Pure and Applied Sciences*, 10(1), 67-79. https://www.ajol.info/index.php/dujopas/article/view/274885
-    > *Cited 14+ times. Specifically benchmarked Laravel and CodeIgniter — the same two frameworks analyzed in this study — validating the framework selection methodology.*
-
-4. Putra, F. P. E., Zulfikri, A., & Rohman, A. (2025). "Analisis Perbandingan Teknik Optimasi Performa Untuk Pengujian Framework PHP: Laravel, CodeIgniter, Symfony." *Brilliance: Research of Artificial Intelligence*, 5(1), 85-96. https://jurnal.itscience.org/index.php/brilliance/article/view/5989
+2. Putra, F. P. E., Zulfikri, A., & Rohman, A. (2025). "Analisis Perbandingan Teknik Optimasi Performa Untuk Pengujian Framework PHP: Laravel, CodeIgniter, Symfony." *Brilliance: Research of Artificial Intelligence*, 5(1), 85-96.
     > *Indonesian academic study comparing Laravel, CodeIgniter, and Symfony using performance optimization techniques. Demonstrates active Indonesian academic interest in this specific framework comparison.*
-    
-5. Maskur, M., Sari, Z., & Miftakh, A. S. (2018). "Implementation of Obfuscation Technique on PHP Source Code." *2018 5th International Conference on Electrical Engineering, Computer Science and Informatics (EECSI)*, 526-531. IEEE. https://doi.org/10.1109/EECSI.2018.8752712
-    > *Cited 13+ times. Implemented and evaluated PHP source code obfuscation, finding that obfuscation has minimal impact on execution time — a finding consistent with our minimal-profile results.*
 
-6. Samra, J. (2015). "Comparing Performance of Plain PHP and Four of Its Popular Frameworks." *Bachelor Thesis, Blekinge Institute of Technology*. https://www.diva-portal.org/smash/get/diva2:846115/FULLTEXT01.pdf
-    > *Cited 29+ times. Provided the baseline methodology for comparing plain PHP against framework-based implementations using equivalent HTTP endpoints.*
-
-7. Karl, M., Koch, S., Klein, D., & Johns, M. (2025). "Uncovering Bigger Truths: Deobfuscating PHP with Phoebe." *2025 IEEE Annual Conference*. 
+3. Karl, M., Koch, S., Klein, D., & Johns, M. (2025). "Uncovering Bigger Truths: Deobfuscating PHP with Phoebe." *2025 IEEE Annual Conference on Pervasive Computing and Communications (PerCom)*.
     > *Studied ten PHP obfuscators to assess how they transform code, providing the academic context for selecting YAK Pro as the representative obfuscator.*
 
-8. Khairunisa, I., & Kabetta, H. (2021). "PHP Source Code Protection Using Layout Obfuscation and AES-256 Encryption Algorithm." *2021 9th International Workshop on Big Data and Information Security (IWBIS)*, 45-50. IEEE. https://doi.org/10.1109/IWBIS53353.2021.9631855
-    > *Cited 9+ times. Combined code obfuscation with encryption for PHP source code protection, with performance tests and compatibility analysis.*
+4. Khairunisa, I., & Kabetta, H. (2021). "PHP Source Code Protection Using Layout Obfuscation and AES-256 Encryption Algorithm." *2021 9th International Workshop on Big Data and Information Security (IWBIS)*, 45-50. IEEE. https://doi.org/10.1109/IWBIS53353.2021.9631855
+    > *Combined code obfuscation with encryption for PHP source code protection, with performance tests and compatibility analysis.*
 
-9. Haris, N. A., & Hasim, N. (2019). "PHP Frameworks Usability in Web Application Development." *International Journal of Recent Technology and Engineering (IJRTE)*, 8(2S3), 109-113. https://doi.org/10.35940/ijrte.B1021.0782S319
-    > *Cited 35+ times. Analyzed PHP framework usability and performance trade-offs, supporting the framework selection criteria used in this research.*
+5. Niarman, A., & Iswandi, N. (2023). "Comparative Analysis of PHP Frameworks for Development of Academic Information System Using Load and Stress Testing." *International Journal of Software Engineering and Computer Systems*, 9(1), 44-52.
+    > *Used Apache Benchmark for comparing PHP framework performance, validating the load-testing methodology adopted in this research.*
 
-10. Niarman, A., & Iswandi, N. (2023). "Comparative Analysis of PHP Frameworks for Development of Academic Information System Using Load and Stress Testing." *International Journal of Software Engineering and Computer Systems*, 9(1), 44-52. https://doi.org/10.15282/ijsecs.9.1.2023.5.0114
-    > *Cited 44+ times. Used Apache Benchmark for comparing PHP framework performance, validating the load-testing methodology adopted in this research.*
-
-11. Raitsis, T., Elgazari, Y., Toibin, G. E., Lurie, Y., & Mark, S. (2025). "Code Obfuscation: A Comprehensive Approach to Detection, Classification, and Ethical Challenges." *Algorithms*, 18(2), 75. https://doi.org/10.3390/a18020075
-    > *Cited 12+ times. Comprehensive survey of code obfuscation techniques and their performance implications, providing context for the obfuscation impact analysis in this study.*
-
-12. Zurkiewicz, A., & Miłosz, M. (2015). "Selecting a PHP Framework for a Web Application Project — The Method and Case Study." *INTED2015 Proceedings*, 4550-4559. https://library.iated.org/view/ZURKIEWICZ2015SEL
-    > *Cited 16+ times. Established methodology for PHP framework selection based on performance criteria and project requirements.*
+6. Raitsis, T., Elgazari, Y., Toibin, G. E., Lurie, Y., & Mark, S. (2025). "Code Obfuscation: A Comprehensive Approach to Detection, Classification, and Ethical Challenges." *Algorithms*, 18(2), 75. https://doi.org/10.3390/a18020075
+    > *Comprehensive survey of code obfuscation techniques and their performance implications, providing context for the obfuscation impact analysis in this study.*
 
 ---
 
@@ -96,7 +78,7 @@ This study addresses three primary questions relevant to Indonesian PHP practiti
 
 ### 2.2 Target Applications
 
-Three applications were built with identical HTTP endpoint semantics, following the methodology of Samra [6] who first demonstrated that plain PHP and framework-based implementations can be directly compared when endpoints share equivalent behavior:
+Three applications were built with identical HTTP endpoint semantics, following the methodology established in prior PHP framework comparison research [1][5]:
 
 1. **Native PHP** — Single-file front controller with PDO and phpredis
 2. **Laravel 13.x** — Full-stack framework with Eloquent ORM and Redis facade
@@ -184,7 +166,7 @@ mod_php delivers the highest classic-runtime throughput but at a severe latency 
 
 **Critical finding**: The performance impact of obfuscation is **workload-dependent**.
 
-On stateless endpoints (`hello`, `json`), even maximal obfuscation shows negligible cost (±5%). This is because the PHP runtime has already parsed and cached the obfuscated bytecode — the goto transformations and variable renaming are resolved at compile time, not runtime. This finding is consistent with Maskur et al. [5] who observed that obfuscation techniques have minimal runtime impact when the PHP parser resolves all transformations at the compilation stage. This finding is consistent with Maskur et al. [5] who observed that obfuscation techniques have minimal runtime impact when the PHP parser resolves all transformations at the compilation stage.
+On stateless endpoints (`hello`, `json`), even maximal obfuscation shows negligible cost (±5%). This is because the PHP runtime has already parsed and cached the obfuscated bytecode — the goto transformations and variable renaming are resolved at compile time, not runtime.  This finding is consistent with who observed that obfuscation techniques have minimal runtime impact when the PHP parser resolves all transformations at the compilation stage.
 
 On data-backed endpoints, the situation reverses dramatically. The `db-list` scenario shows a 32% loss with minimal obfuscation and 53% with maximal. The `db-read-cache-warm` scenario is worst at 67% loss. This is caused by:
 
@@ -204,7 +186,7 @@ The practical recommendation: **minimal profile for production**, maximal only w
 | CodeIgniter 4 | 184 | **52x slower** | Lightweight MVC |
 | Laravel 13 | 44 | **219x slower** | Full-stack with DI container |
 
-The framework tax is severe without OPcache. Laravel's service container, Eloquent ORM initialization, middleware pipeline, and route resolution cost ~219x throughput compared to native PHP. CodeIgniter's simpler architecture reduces this to ~52x. These findings align with Samra [6] who found similar orders of magnitude for framework overhead, and with Haris & Hasim [9] who documented that framework usability features come at measurable performance cost. These findings align with Samra [6] who found similar orders of magnitude for framework overhead, and with Haris & Hasim [9] who documented that framework usability features come at measurable performance cost.
+The framework tax is severe without OPcache. Laravel's service container, Eloquent ORM initialization, middleware pipeline, and route resolution cost ~219x throughput compared to native PHP. CodeIgniter's simpler architecture reduces this to ~52x. These findings align with Niarman & Iswandi [5] who documented that framework usability features come at measurable performance cost, and with the benchmark methodology established by Ahmed et al. [1] for comparing PHP framework implementations.
 
 ### 3.5 OPcache: The Great Equalizer
 
@@ -296,7 +278,7 @@ The central finding of this research:
 
 ## 5. Conclusion
 
-This study extends prior work on PHP framework performance comparison (Laaziri et al. [1], Prokofyeva & Boltunova [2], Ahmed et al. [3]) by adding two novel dimensions: (1) obfuscation performance impact using YAK Pro, and (2) cross-runtime comparison across six PHP execution models. The key findings, validated against the Indonesian academic study by Putra et al. [4] who also selected Laravel and CodeIgniter for their research, are:
+This study extends prior work on PHP framework performance comparison (Ahmed et al. [1], Putra et al. [2], Niarman & Iswandi [5]) by adding two novel dimensions: (1) obfuscation performance impact using YAK Pro, validated through the obfuscator analysis framework of Karl et al. [3] and the comprehensive survey of Raitsis et al. [6], and (2) cross-runtime comparison across six PHP execution models. The key findings, validated against the Indonesian academic study by Putra et al. [2] who also selected Laravel and CodeIgniter for their research, are:
 
 1. **Runtime architecture is the dominant performance factor** — choosing Swoole over php-fpm provides a 17x throughput advantage, far exceeding any obfuscation cost (±5% on stateless workloads).
 
