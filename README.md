@@ -16,15 +16,14 @@ Current version-tier profiles:
 
 Current state:
 
-1. Repository scaffold and benchmark contract are in place.
-2. Pilot implementation target is `php-fpm` with `hello`, `json`, `db-read`, and `db-read-cache-warm` scenarios.
-3. Result schemas are defined in `config/schemas/`.
+1. **228 cells, 294 runs** across 6 runtimes, 3 frameworks, 15 scenarios
+2. Multi-rep validation with RSD metrics on 8 key cells
+3. 4 CRUD scenarios (POST/PUT/DELETE) across all frameworks
+4. Statistical aggregation with median, stdev, RSD, IQR
 
 Start here:
 
 1. `docs/implementation-plan.md`
-2. `config/profiles/pilot.yaml`
-3. `config/profiles/latest.yaml`
-4. `config/profiles/modern-lts.yaml`
-5. `config/profiles/legacy-lts.yaml`
-6. `config/schemas/benchmark-profile.schema.json`
+2. **`docs/pipeline.md`** — full pipeline architecture and execution flow
+3. `config/profiles/pilot.yaml`
+4. `config/profiles/latest.yaml`
